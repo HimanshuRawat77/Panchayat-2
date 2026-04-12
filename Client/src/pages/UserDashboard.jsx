@@ -1,58 +1,59 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Bell, 
-  MessageCircle, 
-  Plus, 
-  Zap, 
-  AlertCircle, 
-  CheckCircle, 
-  Clock, 
-  Wrench,
-  FileText,
-  Home,
-  User,
-  ChevronRight,
-  Heart,
-  MessageSquare,
-  Share2,
-  MapPin,
-  Users,
+import React, { useState, useEffect, useMemo } from 'react';
+import {
+  AlertCircle,
+  Bell,
   BookOpen,
-  Phone,
-  MapPinIcon,
-  Briefcase,
-  Send
+  Building2,
+  ChevronRight,
+  Hammer,
+  Heart,
+  Home,
+  LayoutDashboard,
+  LogOut,
+  Megaphone,
+  MessageCircle,
+  MessageSquare,
+  Mic,
+  PenLine,
+  Pin,
+  Send,
+  Share2,
+  Sparkles,
+  Type,
+  Users,
+  Wrench,
+  X,
+  Zap,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Typewriter } from '../components/ui/typewriter';
+
+function readUserFromStorage() {
+  try {
+    const storedUser = localStorage.getItem('user');
+    if (!storedUser) return null;
+    const parsedUser = JSON.parse(storedUser);
+    return {
+      fullName: parsedUser.fullName || 'User',
+      block: parsedUser.block || 'N/A',
+      avatar: parsedUser.avatar || '👤',
+      unreadNotifications: parsedUser.unreadNotifications || 0,
+    };
+  } catch {
+    return null;
+  }
+}
 
 const UserDashboard = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState({
-    fullName: 'Loading...',
-    block: '...',
-    avatar: '👤',
-    unreadNotifications: 0
-  });
-
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [user] = useState(readUserFromStorage);
   const [showAIChat, setShowAIChat] = useState(false);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    // console.log("Dashboard loaded user data:", storedUser);
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser({
-        fullName: parsedUser.fullName || 'User',
-        block: parsedUser.block || 'N/A',
-        avatar: parsedUser.avatar || '👤',
-        unreadNotifications: parsedUser.unreadNotifications || 0
-      });
-    } else {
+    if (!user) {
       navigate('/login');
     }
-  }, [navigate]);
+  }, [user, navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -60,114 +61,108 @@ const UserDashboard = () => {
     navigate('/login');
   };
 
-  // Daily Suvichar/Motivational Quotes
-  const motivationalQuotes = [
-    { 
-      quote: "सच्चा समाज वह है जहाँ हर व्यक्ति एक-दूसरे की मदद करता है।", 
-      author: "महात्मा गांधी",
-      emoji: "🕉️"
-    },
-    { 
-      quote: "एकता में शक्ति है, साथ मिलकर हम सब कुछ कर सकते हैं।", 
-      author: "स्वामी विवेकानंद",
-      emoji: "💪"
-    },
-    { 
-      quote: "अपने समाज की सेवा ही सबसे बड़ा धर्म है।", 
-      author: "लोकमान्य तिलक",
-      emoji: "🙏"
-    },
-    { 
-      quote: "स्वच्छता और अनुशासन से ही समाज का विकास होता है।", 
-      author: "महात्मा गांध��",
-      emoji: "✨"
-    }
-  ];
+  const motivationalQuotes = useMemo(
+    () => [
+      {
+        quote: 'सच्चा समाज वह है जहाँ हर व्यक्ति एक-दूसरे की मदद करता है।',
+        author: 'महात्मा गांधी',
+      },
+      {
+        quote: 'एकता में शक्ति है, साथ मिलकर हम सब कुछ कर सकते हैं।',
+        author: 'स्वामी विवेकानंद',
+      },
+      {
+        quote: 'अपने समाज की सेवा ही सबसे बड़ा धर्म है।',
+        author: 'लोकमान्य तिलक',
+      },
+      {
+        quote: 'स्वच्छता और अनुशासन से ही समाज का विकास होता है।',
+        author: 'महात्मा गांधी',
+      },
+    ],
+    [],
+  );
 
-  const getDailySuvichar = () => {
+  const suvichar = useMemo(() => {
     const day = new Date().getDay();
     return motivationalQuotes[day % motivationalQuotes.length];
-  };
+  }, [motivationalQuotes]);
 
-  const [suvichar] = useState(getDailySuvichar());
-
-  // Notices Data
   const notices = [
     {
       id: 1,
-      title: "🎉 Annual Society Fest - 15th April",
-      category: "event",
-      priority: "high",
-      content: "Join us for the annual society fest with games, food, and entertainment.",
-      expiryDate: "2026-04-15",
-      isPinned: true
+      title: 'Annual Society Fest — 15 April',
+      category: 'event',
+      priority: 'high',
+      content: 'Join us for the annual society fest with games, food, and entertainment.',
+      expiryDate: '2026-04-15',
+      isPinned: true,
     },
     {
       id: 2,
-      title: "⚡ Power Maintenance - 14th April (2-6 PM)",
-      category: "urgent",
-      priority: "critical",
-      content: "Scheduled power maintenance. Please keep water tanks filled.",
-      expiryDate: "2026-04-14",
-      isPinned: true
+      title: 'Power maintenance — 14 April (2–6 PM)',
+      category: 'urgent',
+      priority: 'critical',
+      content: 'Scheduled power maintenance. Please keep water tanks filled.',
+      expiryDate: '2026-04-14',
+      isPinned: true,
     },
     {
       id: 3,
-      title: "📋 New Parking Guidelines",
-      category: "info",
-      priority: "medium",
-      content: "Updated parking rules effective from April 1st.",
-      expiryDate: "2026-05-01",
-      isPinned: false
-    }
+      title: 'New parking guidelines',
+      category: 'info',
+      priority: 'medium',
+      content: 'Updated parking rules effective from 1 April.',
+      expiryDate: '2026-05-01',
+      isPinned: false,
+    },
   ];
 
-  // User's Complaints Summary
   const complaintStats = {
     total: 12,
     pending: 2,
     inProgress: 3,
-    resolved: 7
+    resolved: 7,
   };
 
   const recentComplaints = [
     {
       id: 'C001',
-      title: 'Water Leakage in Kitchen',
-      status: 'In Progress',
+      title: 'Water leakage in kitchen',
+      status: 'In progress',
       category: 'Plumber',
       date: '2026-04-10',
       priority: 'high',
-      statusColor: 'bg-blue-100 text-blue-800'
+      statusStyle:
+        'bg-indigo-100 text-indigo-800 dark:bg-indigo-500/20 dark:text-indigo-200',
     },
     {
       id: 'C002',
-      title: 'Electrical Fault in Main Gate',
+      title: 'Electrical fault at main gate',
       status: 'Pending',
       category: 'Electrician',
       date: '2026-04-11',
       priority: 'critical',
-      statusColor: 'bg-red-100 text-red-800'
+      statusStyle: 'bg-rose-100 text-rose-800 dark:bg-rose-500/20 dark:text-rose-200',
     },
     {
       id: 'C003',
-      title: 'Broken Door Lock',
+      title: 'Broken door lock',
       status: 'Resolved',
       category: 'Carpenter',
       date: '2026-04-05',
       priority: 'low',
-      statusColor: 'bg-green-100 text-green-800'
-    }
+      statusStyle:
+        'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-200',
+    },
   ];
 
-  // Quick Services
   const quickServices = [
-    { id: 1, name: 'Plumber', icon: '🔧', color: 'from-blue-500 to-blue-600' },
-    { id: 2, name: 'Electrician', icon: '⚡', color: 'from-yellow-500 to-yellow-600' },
-    { id: 3, name: 'Carpenter', icon: '🪛', color: 'from-orange-500 to-orange-600' },
+    { id: 1, name: 'Plumber', Icon: Wrench, from: 'from-sky-500', to: 'to-blue-600' },
+    { id: 2, name: 'Electrician', Icon: Zap, from: 'from-amber-500', to: 'to-orange-600' },
+    { id: 3, name: 'Carpenter', Icon: Hammer, from: 'from-orange-500', to: 'to-red-600' },
   ];
 
-  // To-Let Listings
   const toLet = [
     {
       id: 1,
@@ -176,7 +171,6 @@ const UserDashboard = () => {
       rent: '₹15,000',
       owner: 'Amit Singh',
       contact: '9876543210',
-      image: '🏠'
     },
     {
       id: 2,
@@ -185,11 +179,9 @@ const UserDashboard = () => {
       rent: '₹22,000',
       owner: 'Priya Sharma',
       contact: '9876543211',
-      image: '🏢'
-    }
+    },
   ];
 
-  // Property Sell Listings
   const propertyForSale = [
     {
       id: 1,
@@ -197,362 +189,512 @@ const UserDashboard = () => {
       bhk: '3 BHK',
       price: '₹45,00,000',
       owner: 'Vikram Patel',
-      description: 'Corner Plot',
-      image: '🏡'
-    }
+      description: 'Corner plot',
+    },
   ];
 
-  // Community Feed
   const communityPosts = [
     {
       id: 1,
       author: 'Neha Gupta',
       block: 'Block A',
-      type: 'Lost & Found',
-      content: 'Lost: Black cat near Block A gate. Please contact if seen.',
+      type: 'Lost & found',
+      content: 'Lost: black cat near Block A gate. Please contact if seen.',
       timestamp: '2 hours ago',
       likes: 5,
       comments: 2,
-      isLiked: false
     },
     {
       id: 2,
       author: 'Raj Kumar',
       block: 'Block D',
       type: 'Event',
-      content: 'Cricket match tomorrow evening at 5 PM. All are welcome!',
+      content: 'Cricket match tomorrow evening at 5 PM. All are welcome.',
       timestamp: '4 hours ago',
       likes: 12,
       comments: 8,
-      isLiked: false
-    }
+    },
   ];
 
   const societyRules = [
-    { rule: '🏋️ Gym Timings: 6 AM - 9 PM', icon: '🏋️' },
-    { rule: '🚗 No Parking in Common Areas', icon: '🚗' },
-    { rule: '🔕 Quiet Hours: 10 PM - 7 AM', icon: '🔕' },
-    { rule: '🎭 Events Only on Weekends', icon: '🎭' }
+    { rule: 'Gym timings: 6 AM – 9 PM' },
+    { rule: 'No parking in common areas' },
+    { rule: 'Quiet hours: 10 PM – 7 AM' },
+    { rule: 'Events only on weekends' },
   ];
 
+  if (!user) {
+    return null;
+  }
+
+  const priorityBadge = (p) => {
+    const map = {
+      critical:
+        'bg-rose-500/15 text-rose-700 ring-rose-500/20 dark:text-rose-300 dark:ring-rose-500/30',
+      high: 'bg-amber-500/15 text-amber-800 ring-amber-500/20 dark:text-amber-200 dark:ring-amber-500/30',
+      medium:
+        'bg-sky-500/15 text-sky-800 ring-sky-500/20 dark:text-sky-200 dark:ring-sky-500/30',
+    };
+    return map[p] || map.medium;
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Enhanced Navbar */}
-      <nav className="bg-white/10 backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-3xl">🏘️</span>
-            <h1 className="text-2xl font-black text-white">Panchayat</h1>
-          </div>
-          
-          <div className="flex items-center gap-6">
-            <button className="relative p-2 text-white hover:bg-white/10 rounded-lg transition">
-              <Bell className="w-6 h-6" />
-              <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full"></span>
-            </button>
-            
-            <button 
-              onClick={() => setShowAIChat(!showAIChat)}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:shadow-lg hover:shadow-purple-500/50 transition"
+    <div className="min-h-screen bg-[#f8fafc] font-sans text-slate-900 transition-colors dark:bg-[#070a12] dark:text-white">
+      <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
+        <div className="absolute -left-32 top-0 h-96 w-96 rounded-full bg-indigo-400/10 blur-[100px] dark:bg-indigo-600/15" />
+        <div className="absolute -right-20 bottom-20 h-[28rem] w-[28rem] rounded-full bg-violet-400/10 blur-[120px] dark:bg-violet-600/12" />
+      </div>
+
+      <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/80 backdrop-blur-xl dark:border-slate-800/80 dark:bg-slate-950/80">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3.5">
+          <div className="flex min-w-0 items-center gap-3">
+            <Link
+              to="/"
+              className="flex shrink-0 items-center gap-2 rounded-xl text-slate-900 transition hover:opacity-90 dark:text-white"
             >
-              <MessageCircle className="w-5 h-5" />
-              AI Chat
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/25">
+                <Building2 className="h-[1.15rem] w-[1.15rem]" strokeWidth={2} />
+              </span>
+              <span className="hidden font-bold tracking-tight sm:inline">Panchayat</span>
+            </Link>
+            <span className="hidden h-6 w-px bg-slate-200 dark:bg-slate-700 sm:block" />
+            <span className="hidden items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 sm:flex">
+              <LayoutDashboard className="h-3.5 w-3.5" strokeWidth={2} />
+              Dashboard
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button
+              type="button"
+              className="relative rounded-xl border border-slate-200/90 bg-white/90 p-2.5 text-slate-600 transition hover:border-slate-300 hover:bg-white dark:border-slate-700 dark:bg-slate-900/90 dark:text-slate-300 dark:hover:border-slate-600"
+              aria-label="Notifications"
+            >
+              <Bell className="h-5 w-5" strokeWidth={2} />
+              {user.unreadNotifications > 0 && (
+                <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-slate-950" />
+              )}
             </button>
-            
-            <div onClick={() => navigate("/profile")} className="flex items-center gap-3 pl-4 border-l border-white/20 cursor-pointer hover:bg-white/5 p-1 rounded-xl transition">
-              <div className="text-right">
-                <p className="text-white font-semibold text-sm">{user.fullName}</p>
-                <p className="text-white/60 text-xs">{user.block}</p>
-              </div>
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-xl overflow-hidden shadow-lg border-2 border-white/20">
+
+            <button
+              type="button"
+              onClick={() => setShowAIChat((v) => !v)}
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-3 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition hover:shadow-lg hover:shadow-indigo-500/30 sm:px-4"
+            >
+              <MessageCircle className="h-4 w-4 shrink-0" strokeWidth={2} />
+              <span className="hidden sm:inline">AI assistant</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate('/profile')}
+              className="flex items-center gap-2 rounded-xl border border-slate-200/90 bg-white/90 py-1.5 pl-1.5 pr-3 transition hover:border-slate-300 hover:bg-white dark:border-slate-700 dark:bg-slate-900/90 dark:hover:border-slate-600"
+            >
+              <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 text-sm font-bold text-white shadow-inner">
                 {user.avatar && user.avatar.length > 5 ? (
-                  <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
+                  <img src={user.avatar} alt="" className="h-full w-full object-cover" />
                 ) : (
-                  user.avatar || '👤'
+                  <span className="text-lg leading-none">{user.avatar || '👤'}</span>
                 )}
               </div>
-            </div>
+              <div className="hidden text-left sm:block">
+                <p className="max-w-[8rem] truncate text-sm font-semibold leading-tight text-slate-900 dark:text-white">
+                  {user.fullName}
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{user.block}</p>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="rounded-xl border border-slate-200/90 p-2.5 text-slate-500 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 dark:border-slate-700 dark:text-slate-400 dark:hover:border-rose-900/50 dark:hover:bg-rose-950/40 dark:hover:text-rose-400"
+              aria-label="Log out"
+            >
+              <LogOut className="h-5 w-5" strokeWidth={2} />
+            </button>
           </div>
         </div>
-      </nav>
+      </header>
 
-      {/* AI Chat Widget */}
       {showAIChat && (
-        <div className="fixed bottom-20 right-8 w-96 h-96 bg-white rounded-2xl shadow-2xl z-40 flex flex-col">
-          <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-4 rounded-t-2xl text-white font-bold flex justify-between items-center">
-            🤖 Panchayat AI Assistant
-            <button onClick={() => setShowAIChat(false)} className="text-lg">×</button>
+        <div
+          className="fixed bottom-6 right-4 z-40 flex w-[min(100vw-2rem,24rem)] flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-2xl shadow-slate-900/10 dark:border-slate-700 dark:bg-slate-900 dark:shadow-black/40 sm:right-6"
+          role="dialog"
+          aria-label="AI assistant"
+        >
+          <div className="flex items-center justify-between bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-3 text-white">
+            <div className="flex items-center gap-2 text-sm font-semibold">
+              <Sparkles className="h-4 w-4" strokeWidth={2} />
+              Panchayat AI
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowAIChat(false)}
+              className="rounded-lg p-1 transition hover:bg-white/15"
+              aria-label="Close"
+            >
+              <X className="h-5 w-5" strokeWidth={2} />
+            </button>
           </div>
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            <div className="bg-gray-100 p-3 rounded-lg max-w-xs">
-              <p className="text-sm text-gray-800">Hi! 👋 I'm your AI assistant. Ask me about society rules, complaint status, or anything else!</p>
+          <div className="max-h-64 space-y-3 overflow-y-auto p-4">
+            <div className="max-w-[90%] rounded-2xl rounded-bl-md bg-slate-100 px-4 py-3 text-sm leading-relaxed text-slate-800 dark:bg-slate-800 dark:text-slate-200">
+              Hi — ask about society rules, complaint status, or facilities.
             </div>
           </div>
-          <div className="border-t p-4 flex gap-2">
-            <input 
-              type="text" 
-              placeholder="Ask me anything..." 
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+          <div className="flex gap-2 border-t border-slate-200/80 p-3 dark:border-slate-700">
+            <input
+              type="text"
+              placeholder="Ask anything…"
+              className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none ring-indigo-500/0 transition placeholder:text-slate-400 focus:border-indigo-300 focus:ring-4 focus:ring-indigo-500/10 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
             />
-            <button className="bg-purple-500 text-white p-2 rounded-lg hover:bg-purple-600">
-              <Send className="w-5 h-5" />
+            <button
+              type="button"
+              className="flex shrink-0 items-center justify-center rounded-xl bg-indigo-600 p-2.5 text-white transition hover:bg-indigo-500"
+              aria-label="Send"
+            >
+              <Send className="h-5 w-5" strokeWidth={2} />
             </button>
           </div>
         </div>
       )}
 
-      <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
-
-        {/* 1. Daily Suvichar Card */}
-        <div className="bg-gradient-to-r from-orange-400 via-pink-400 to-red-400 rounded-3xl p-8 text-white shadow-2xl hover:shadow-orange-500/30 transition-all">
-          <div className="flex items-center gap-3 mb-6">
-            <span className="text-4xl">{suvichar.emoji}</span>
-            <span className="text-sm font-black uppercase tracking-widest opacity-90">आज का सुविचार</span>
+      <main className="relative z-10 mx-auto max-w-6xl space-y-8 px-4 py-8 md:space-y-10 md:py-10">
+        <section className="relative overflow-hidden rounded-3xl border border-amber-200/50 bg-gradient-to-br from-amber-500/90 via-orange-500/85 to-rose-600/90 p-8 text-white shadow-glow-sm md:p-10">
+          <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-white/20 blur-3xl" />
+          <div className="relative mb-6 flex items-center gap-3">
+            <Sparkles className="h-8 w-8 opacity-90" strokeWidth={1.5} />
+            <span className="text-xs font-bold uppercase tracking-[0.2em] opacity-95">
+              आज का सुविचार
+            </span>
           </div>
-          <div className="text-3xl md:text-4xl font-bold leading-relaxed italic mb-6">
-            <Typewriter 
-              words={[suvichar.quote]} 
-              speed={50}
-              delayBetweenWords={5000}
-              cursor={true}
-            />
+          <div className="relative text-2xl font-semibold leading-relaxed md:text-3xl">
+            <Typewriter words={[suvichar.quote]} speed={50} delayBetweenWords={5000} cursor />
           </div>
-          <p className="text-lg font-semibold opacity-90 border-l-4 border-white/30 pl-4">
+          <p className="relative mt-6 border-l-2 border-white/40 pl-4 text-base font-medium opacity-95">
             — {suvichar.author}
           </p>
-        </div>
+        </section>
 
-        {/* 2. Notice Board */}
-        <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8">
-          <div className="flex items-center gap-3 mb-6">
-            <AlertCircle className="w-8 h-8 text-red-400" />
-            <h2 className="text-3xl font-bold text-white">📢 Notice Board</h2>
+        <section className="rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-card backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/50 dark:shadow-card-dark md:p-8">
+          <div className="mb-6 flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400">
+              <Megaphone className="h-6 w-6" strokeWidth={2} />
+            </div>
+            <h2 className="text-xl font-bold tracking-tight md:text-2xl">Notice board</h2>
           </div>
           <div className="grid gap-4">
             {notices.map((notice) => (
-              <div 
+              <div
                 key={notice.id}
-                className={`p-6 rounded-2xl border-l-4 cursor-pointer hover:shadow-lg transition ${
-                  notice.isPinned 
-                    ? 'bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border-yellow-400' 
-                    : 'bg-white/5 border-blue-400'
+                className={`group cursor-pointer rounded-2xl border p-5 transition hover:shadow-md md:p-6 ${
+                  notice.isPinned
+                    ? 'border-amber-200/80 bg-amber-50/50 dark:border-amber-500/20 dark:bg-amber-500/5'
+                    : 'border-slate-200/80 bg-slate-50/50 dark:border-slate-700/80 dark:bg-slate-800/30'
                 }`}
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      {notice.isPinned && <span className="text-yellow-400">📌</span>}
-                      <h3 className="text-xl font-bold text-white">{notice.title}</h3>
-                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                        notice.priority === 'critical' ? 'bg-red-500/30 text-red-200' :
-                        notice.priority === 'high' ? 'bg-orange-500/30 text-orange-200' :
-                        'bg-blue-500/30 text-blue-200'
-                      }`}>
-                        {notice.priority.toUpperCase()}
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-2 flex flex-wrap items-center gap-2">
+                      {notice.isPinned && (
+                        <Pin className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" strokeWidth={2} />
+                      )}
+                      <h3 className="font-semibold text-slate-900 dark:text-white">{notice.title}</h3>
+                      <span
+                        className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ring-1 ${priorityBadge(notice.priority)}`}
+                      >
+                        {notice.priority}
                       </span>
                     </div>
-                    <p className="text-white/70 mb-3">{notice.content}</p>
-                    <p className="text-white/50 text-sm">Expires: {notice.expiryDate}</p>
+                    <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                      {notice.content}
+                    </p>
+                    <p className="mt-3 text-xs font-medium text-slate-500 dark:text-slate-500">
+                      Expires {notice.expiryDate}
+                    </p>
                   </div>
-                  <ChevronRight className="w-6 h-6 text-white/50" />
+                  <ChevronRight className="h-5 w-5 shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-indigo-500 dark:text-slate-500" />
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
-        {/* 3. Quick Complaint Access */}
-        <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-400/30 rounded-3xl p-8">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-white mb-2">🎤 Raise Complaint</h2>
-            <p className="text-white/70">Use voice or text to report issues</p>
+        <section className="rounded-3xl border border-indigo-200/60 bg-gradient-to-br from-indigo-500/5 via-white/80 to-violet-500/5 p-6 dark:border-indigo-500/20 dark:from-indigo-500/10 dark:via-slate-900/50 dark:to-violet-500/10 md:p-8">
+          <div className="mb-8 text-center">
+            <h2 className="text-xl font-bold tracking-tight md:text-2xl">Raise a complaint</h2>
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+              Voice or text — same streamlined flow
+            </p>
           </div>
-          <div className="grid md:grid-cols-2 gap-6">
-            <button className="group p-8 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl text-white hover:shadow-2xl hover:shadow-blue-500/50 transition">
-              <div className="text-5xl mb-4">🎙️</div>
-              <h3 className="text-2xl font-bold mb-2">Voice Input</h3>
-              <p className="text-white/80 mb-4">Describe your issue by speaking</p>
-              <p className="text-sm opacity-75">Click to start recording →</p>
-            </button>
-            <button className="group p-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl text-white hover:shadow-2xl hover:shadow-green-500/50 transition">
-              <div className="text-5xl mb-4">✍️</div>
-              <h3 className="text-2xl font-bold mb-2">Text Input</h3>
-              <p className="text-white/80 mb-4">Type your complaint details</p>
-              <p className="text-sm opacity-75">Click to start typing →</p>
-            </button>
-          </div>
-        </div>
-
-        {/* 4. Complaint Summary Stats */}
-        <div className="grid md:grid-cols-4 gap-6">
-          {[
-            { label: 'Total', count: complaintStats.total, color: 'from-blue-500 to-blue-600', icon: '📊' },
-            { label: 'Pending', count: complaintStats.pending, color: 'from-yellow-500 to-orange-600', icon: '⏳' },
-            { label: 'In Progress', count: complaintStats.inProgress, color: 'from-purple-500 to-pink-600', icon: '🔄' },
-            { label: 'Resolved', count: complaintStats.resolved, color: 'from-green-500 to-emerald-600', icon: '✅' },
-          ].map((stat, idx) => (
-            <div 
-              key={idx}
-              className={`bg-gradient-to-br ${stat.color} rounded-2xl p-6 text-white shadow-lg hover:shadow-2xl transition`}
+          <div className="grid gap-4 md:grid-cols-2 md:gap-6">
+            <button
+              type="button"
+              className="group flex flex-col items-start rounded-2xl border border-slate-200/80 bg-white p-8 text-left shadow-sm transition hover:border-indigo-200 hover:shadow-glow-sm dark:border-slate-700 dark:bg-slate-900/80 dark:hover:border-indigo-500/30"
             >
-              <div className="text-4xl mb-4">{stat.icon}</div>
-              <p className="text-sm opacity-80 mb-2">{stat.label}</p>
-              <p className="text-4xl font-black">{stat.count}</p>
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-500/25">
+                <Mic className="h-7 w-7" strokeWidth={1.75} />
+              </div>
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Voice</h3>
+              <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+                Describe the issue by speaking — we capture the details.
+              </p>
+              <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-indigo-600 dark:text-indigo-400">
+                Start recording
+                <ChevronRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+              </span>
+            </button>
+            <button
+              type="button"
+              className="group flex flex-col items-start rounded-2xl border border-slate-200/80 bg-white p-8 text-left shadow-sm transition hover:border-emerald-200 hover:shadow-md dark:border-slate-700 dark:bg-slate-900/80 dark:hover:border-emerald-500/25"
+            >
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/20">
+                <Type className="h-7 w-7" strokeWidth={1.75} />
+              </div>
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Text</h3>
+              <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+                Type what happened — attach context and photos when ready.
+              </p>
+              <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+                Open form
+                <PenLine className="h-4 w-4 transition group-hover:translate-x-0.5" />
+              </span>
+            </button>
+          </div>
+        </section>
+
+        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            { label: 'Total', count: complaintStats.total, Icon: LayoutDashboard, accent: 'from-sky-500 to-blue-600' },
+            { label: 'Pending', count: complaintStats.pending, Icon: AlertCircle, accent: 'from-amber-500 to-orange-600' },
+            { label: 'In progress', count: complaintStats.inProgress, Icon: Zap, accent: 'from-violet-500 to-purple-600' },
+            { label: 'Resolved', count: complaintStats.resolved, Icon: Home, accent: 'from-emerald-500 to-teal-600' },
+          ].map((stat) => (
+            <div
+              key={stat.label}
+              className="rounded-2xl border border-slate-200/80 bg-white/90 p-6 shadow-card backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/60 dark:shadow-card-dark"
+            >
+              <div
+                className={`mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${stat.accent} text-white shadow-md`}
+              >
+                <stat.Icon className="h-5 w-5" strokeWidth={2} />
+              </div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                {stat.label}
+              </p>
+              <p className="mt-1 text-3xl font-bold tabular-nums tracking-tight">{stat.count}</p>
             </div>
           ))}
-        </div>
+        </section>
 
-        {/* 5. Recent Complaints */}
-        <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8">
-          <h2 className="text-3xl font-bold text-white mb-6">📋 My Recent Complaints</h2>
-          <div className="space-y-4">
+        <section className="rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-card backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/50 dark:shadow-card-dark md:p-8">
+          <h2 className="mb-6 text-xl font-bold tracking-tight md:text-2xl">Recent complaints</h2>
+          <div className="space-y-3">
             {recentComplaints.map((complaint) => (
-              <div key={complaint.id} className="bg-white/5 hover:bg-white/10 rounded-2xl p-6 border border-white/10 transition group cursor-pointer">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className={`px-4 py-2 rounded-lg font-semibold text-sm ${complaint.statusColor}`}>
+              <div
+                key={complaint.id}
+                className="group cursor-pointer rounded-2xl border border-slate-200/80 bg-slate-50/80 p-5 transition hover:border-indigo-200/80 hover:bg-white dark:border-slate-700/80 dark:bg-slate-800/40 dark:hover:border-indigo-500/30 dark:hover:bg-slate-800/60 md:p-6"
+              >
+                <div className="flex items-center justify-between gap-4">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span
+                        className={`rounded-lg px-3 py-1 text-xs font-semibold ${complaint.statusStyle}`}
+                      >
                         {complaint.status}
                       </span>
-                      <p className="text-white font-bold text-lg">{complaint.title}</p>
+                      <span className="font-semibold text-slate-900 dark:text-white">
+                        {complaint.title}
+                      </span>
                     </div>
-                    <div className="flex gap-4 text-sm text-white/60">
-                      <span>🏷️ {complaint.category}</span>
-                      <span>📅 {complaint.date}</span>
-                      <span className="text-red-400">🔴 {complaint.priority}</span>
+                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
+                      <span>{complaint.category}</span>
+                      <span>{complaint.date}</span>
+                      <span className="capitalize text-rose-600 dark:text-rose-400">
+                        {complaint.priority} priority
+                      </span>
                     </div>
                   </div>
-                  <ChevronRight className="w-6 h-6 text-white/30 group-hover:text-white/60 transition" />
+                  <ChevronRight className="h-5 w-5 shrink-0 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-indigo-500 dark:text-slate-600" />
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
-        {/* 6. Quick Services Panel */}
-        <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8">
-          <h2 className="text-3xl font-bold text-white mb-6">🔧 Quick Services</h2>
-          <div className="grid md:grid-cols-3 gap-6">
+        <section className="rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-card backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/50 dark:shadow-card-dark md:p-8">
+          <h2 className="mb-6 text-xl font-bold tracking-tight md:text-2xl">Quick services</h2>
+          <div className="grid gap-4 md:grid-cols-3">
             {quickServices.map((service) => (
-              <button 
+              <button
                 key={service.id}
-                className={`group p-8 rounded-2xl text-white font-bold text-2xl bg-gradient-to-br ${service.color} hover:shadow-2xl hover:scale-105 transition`}
+                type="button"
+                className={`group flex flex-col items-center rounded-2xl bg-gradient-to-br ${service.from} ${service.to} p-8 text-center text-white shadow-lg transition hover:scale-[1.02] hover:shadow-xl`}
               >
-                <div className="text-6xl mb-4">{service.icon}</div>
-                <p>{service.name}</p>
-                <p className="text-sm font-normal opacity-80 mt-2">Request Now →</p>
+                <service.Icon className="mb-4 h-10 w-10 opacity-95" strokeWidth={1.75} />
+                <p className="text-lg font-semibold">{service.name}</p>
+                <p className="mt-2 text-sm font-medium text-white/85">Request now</p>
               </button>
             ))}
           </div>
-        </div>
+        </section>
 
-        {/* 7. To-Let Listings */}
-        <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8">
-          <h2 className="text-3xl font-bold text-white mb-6">🏠 To-Let Listings</h2>
-          <div className="grid md:grid-cols-2 gap-6">
+        <section className="rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-card backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/50 dark:shadow-card-dark md:p-8">
+          <h2 className="mb-6 text-xl font-bold tracking-tight md:text-2xl">To-let listings</h2>
+          <div className="grid gap-6 md:grid-cols-2">
             {toLet.map((property) => (
-              <div key={property.id} className="bg-white/5 rounded-2xl overflow-hidden hover:bg-white/10 transition border border-white/10 group cursor-pointer">
-                <div className="h-40 bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-8xl group-hover:scale-110 transition">
-                  {property.image}
+              <div
+                key={property.id}
+                className="group overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-50/50 transition hover:border-indigo-200/60 hover:shadow-md dark:border-slate-700 dark:bg-slate-800/30 dark:hover:border-indigo-500/25"
+              >
+                <div className="flex h-36 items-center justify-center bg-gradient-to-br from-sky-500 to-indigo-600 text-white">
+                  <Home className="h-16 w-16 opacity-90 transition group-hover:scale-105" strokeWidth={1.25} />
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-white mb-3">{property.bhk} • {property.block}</h3>
-                  <p className="text-3xl font-black text-green-400 mb-4">{property.rent}/month</p>
-                  <div className="space-y-2 text-white/70 text-sm mb-6">
-                    <p>👤 Owner: {property.owner}</p>
-                    <p className="flex items-center gap-2">📞 <a href={`tel:${property.contact}`} className="text-blue-400 hover:underline">{property.contact}</a></p>
-                  </div>
-                  <button className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-lg hover:shadow-lg hover:shadow-purple-500/50 transition">
-                    View Details
+                  <h3 className="font-semibold text-slate-900 dark:text-white">
+                    {property.bhk} · {property.block}
+                  </h3>
+                  <p className="mt-2 text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                    {property.rent}
+                    <span className="text-sm font-semibold text-slate-500 dark:text-slate-400">/mo</span>
+                  </p>
+                  <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">Owner · {property.owner}</p>
+                  <a
+                    href={`tel:${property.contact}`}
+                    className="mt-1 inline-block text-sm font-semibold text-indigo-600 hover:underline dark:text-indigo-400"
+                  >
+                    {property.contact}
+                  </a>
+                  <button
+                    type="button"
+                    className="mt-5 w-full rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 py-3 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition hover:shadow-lg"
+                  >
+                    View details
                   </button>
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
-        {/* 8. Property for Sale */}
-        <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8">
-          <h2 className="text-3xl font-bold text-white mb-6">🏡 Properties for Sale</h2>
-          <div className="grid md:grid-cols-2 gap-6">
+        <section className="rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-card backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/50 dark:shadow-card-dark md:p-8">
+          <h2 className="mb-6 text-xl font-bold tracking-tight md:text-2xl">Properties for sale</h2>
+          <div className="grid gap-6 md:grid-cols-2">
             {propertyForSale.map((property) => (
-              <div key={property.id} className="bg-white/5 rounded-2xl overflow-hidden hover:bg-white/10 transition border border-white/10 group cursor-pointer">
-                <div className="h-40 bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-8xl group-hover:scale-110 transition">
-                  {property.image}
+              <div
+                key={property.id}
+                className="group overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-50/50 transition hover:border-amber-200/60 hover:shadow-md dark:border-slate-700 dark:bg-slate-800/30 dark:hover:border-amber-500/20"
+              >
+                <div className="flex h-36 items-center justify-center bg-gradient-to-br from-amber-500 to-rose-600 text-white">
+                  <Building2 className="h-16 w-16 opacity-90 transition group-hover:scale-105" strokeWidth={1.25} />
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-white mb-3">{property.bhk} • {property.block}</h3>
-                  <p className="text-3xl font-black text-yellow-400 mb-4">{property.price}</p>
-                  <p className="text-white/70 mb-4">{property.description}</p>
-                  <p className="text-white/60 text-sm mb-6">Owner: {property.owner}</p>
-                  <button className="w-full py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg hover:shadow-lg hover:shadow-orange-500/50 transition">
-                    I'm Interested
+                  <h3 className="font-semibold text-slate-900 dark:text-white">
+                    {property.bhk} · {property.block}
+                  </h3>
+                  <p className="mt-2 text-2xl font-bold text-amber-600 dark:text-amber-400">{property.price}</p>
+                  <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">{property.description}</p>
+                  <p className="mt-2 text-xs text-slate-500 dark:text-slate-500">Owner · {property.owner}</p>
+                  <button
+                    type="button"
+                    className="mt-5 w-full rounded-xl border-2 border-amber-200 bg-amber-50 py-3 text-sm font-semibold text-amber-900 transition hover:bg-amber-100 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200 dark:hover:bg-amber-500/20"
+                  >
+                    I&apos;m interested
                   </button>
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
-        {/* 9. Society Rules */}
-        <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-bold text-white">📘 Society Rules</h2>
-            <button className="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-lg hover:shadow-lg transition">
-              View All Rules
+        <section className="rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-card backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/50 dark:shadow-card-dark md:p-8">
+          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                <BookOpen className="h-6 w-6" strokeWidth={2} />
+              </div>
+              <h2 className="text-xl font-bold tracking-tight md:text-2xl">Society rules</h2>
+            </div>
+            <button
+              type="button"
+              className="rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition hover:shadow-lg"
+            >
+              View all
             </button>
           </div>
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid gap-3 md:grid-cols-2">
             {societyRules.map((item, idx) => (
-              <div key={idx} className="bg-white/5 p-6 rounded-2xl border border-white/10 hover:bg-white/10 transition text-white font-semibold">
+              <div
+                key={idx}
+                className="rounded-2xl border border-slate-200/80 bg-slate-50/80 px-5 py-4 text-sm font-medium text-slate-800 transition hover:border-indigo-200/60 dark:border-slate-700 dark:bg-slate-800/40 dark:text-slate-200 dark:hover:border-indigo-500/25"
+              >
                 {item.rule}
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
-        {/* 11. Community Feed */}
-        <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8">
-          <h2 className="text-3xl font-bold text-white mb-6">👥 Community Feed</h2>
-          <div className="space-y-6">
+        <section className="rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-card backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/50 dark:shadow-card-dark md:p-8">
+          <div className="mb-6 flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-500/10 text-violet-600 dark:text-violet-400">
+              <Users className="h-6 w-6" strokeWidth={2} />
+            </div>
+            <h2 className="text-xl font-bold tracking-tight md:text-2xl">Community feed</h2>
+          </div>
+          <div className="space-y-4">
             {communityPosts.map((post) => (
-              <div key={post.id} className="bg-white/5 p-6 rounded-2xl border border-white/10 hover:bg-white/10 transition">
-                <div className="flex items-center justify-between mb-4">
+              <article
+                key={post.id}
+                className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-6 transition hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800/40 dark:hover:border-slate-600"
+              >
+                <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white font-bold">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-sm font-bold text-white">
                       {post.author.charAt(0)}
                     </div>
                     <div>
-                      <p className="text-white font-bold">{post.author}</p>
-                      <p className="text-white/50 text-sm">📍 {post.block} • {post.timestamp}</p>
+                      <p className="font-semibold text-slate-900 dark:text-white">{post.author}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        {post.block} · {post.timestamp}
+                      </p>
                     </div>
                   </div>
-                  <span className="px-3 py-1 bg-blue-500/30 text-blue-200 rounded-full text-xs font-bold">
+                  <span className="rounded-full bg-indigo-500/10 px-3 py-1 text-xs font-semibold text-indigo-700 dark:text-indigo-300">
                     {post.type}
                   </span>
                 </div>
-                <p className="text-white/80 mb-6">{post.content}</p>
-                <div className="flex gap-6 text-white/60">
-                  <button className="flex items-center gap-2 hover:text-red-400 transition">
-                    <Heart className="w-5 h-5" /> {post.likes}
+                <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">{post.content}</p>
+                <div className="mt-5 flex gap-6 border-t border-slate-200/80 pt-4 text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-2 transition hover:text-rose-600 dark:hover:text-rose-400"
+                  >
+                    <Heart className="h-4 w-4" strokeWidth={2} />
+                    {post.likes}
                   </button>
-                  <button className="flex items-center gap-2 hover:text-blue-400 transition">
-                    <MessageSquare className="w-5 h-5" /> {post.comments}
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-2 transition hover:text-indigo-600 dark:hover:text-indigo-400"
+                  >
+                    <MessageSquare className="h-4 w-4" strokeWidth={2} />
+                    {post.comments}
                   </button>
-                  <button className="flex items-center gap-2 hover:text-green-400 transition">
-                    <Share2 className="w-5 h-5" />
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-2 transition hover:text-emerald-600 dark:hover:text-emerald-400"
+                  >
+                    <Share2 className="h-4 w-4" strokeWidth={2} />
+                    Share
                   </button>
                 </div>
-              </div>
+              </article>
             ))}
           </div>
-        </div>
-
+        </section>
       </main>
 
-      {/* Footer */}
-      <footer className="py-8 px-4 text-center text-white/60 border-t border-white/10 mt-12">
-        <p className="text-sm">🏘️ Panchayat Smart Living Platform | Building Better Communities Together</p>
+      <footer className="relative z-10 border-t border-slate-200/80 bg-white/60 py-10 text-center text-sm text-slate-500 backdrop-blur-md dark:border-slate-800 dark:bg-slate-950/60 dark:text-slate-400">
+        <p className="font-medium">Panchayat · Smart society operations</p>
       </footer>
     </div>
   );
