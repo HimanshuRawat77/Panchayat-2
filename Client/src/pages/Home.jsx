@@ -124,9 +124,9 @@ const Home = () => {
 
               <div className="mt-16 grid w-full max-w-2xl grid-cols-3 gap-6 border-t border-slate-200/80 pt-10 dark:border-slate-800/80">
                 {[
-                  { label: 'Faster triage', value: '3×' },
-                  { label: 'Resident NPS', value: '4.9' },
-                  { label: 'Uptime', value: '99.9%' },
+                  { label: 'Faster Issue Resolution', value: '⚡ 2×' },
+                  { label: 'Resident Satisfaction', value: '😊 92%' },
+                  { label: 'AI Accuracy', value: '🧠 90%' },
                 ].map((item) => (
                   <div key={item.label} className="text-center">
                     <div className="text-2xl font-bold tabular-nums text-slate-900 dark:text-white md:text-3xl">
