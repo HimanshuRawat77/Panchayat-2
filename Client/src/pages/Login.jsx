@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Mail, Lock, ArrowRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
-import Navbar from '../Components/Navbar';
+import Navbar from '../components/Navbar';
 import API_BASE_URL from '../config';
 
 

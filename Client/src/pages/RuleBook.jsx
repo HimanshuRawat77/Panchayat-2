@@ -7,7 +7,7 @@ import {
   Search,
   ShieldAlert,
 } from 'lucide-react';
-import Navbar from '../Components/Navbar';
+import Navbar from '../components/Navbar';
 import { getRules } from '../services/ruleService';
 
 const IMPORTANT_KEYWORDS = ['important', 'strict', 'mandatory', 'fine', 'safety', 'security'];

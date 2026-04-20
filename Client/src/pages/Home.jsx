@@ -12,7 +12,7 @@ import {
   Sparkles,
   Zap,
 } from 'lucide-react';
-import Navbar from '../Components/Navbar';
+import Navbar from '../components/Navbar';
 import { SparklesCore } from '@/components/ui/sparkles';
 import PricingSection from '@/components/ui/pricing-section';
 import { useTheme } from '../context/ThemeContext';
