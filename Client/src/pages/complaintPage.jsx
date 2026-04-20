@@ -16,8 +16,14 @@ import {
   Upload,
   AlertTriangle,
   Trash2,
+  Mic,
+  MicOff,
+  BrainCircuit,
+  Sparkles,
 } from 'lucide-react';
 import { createComplaint, getMyComplaints } from '../services/complaintService';
+import { getSummary } from '../services/aiService';
+
 
 const categoryMeta = {
   plumber: { label: 'Plumber', Icon: Wrench },
@@ -49,6 +55,81 @@ const ComplaintPage = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [aiSummary, setAiSummary] = useState('');
+  const [summarizing, setSummarizing] = useState(false);
+
+  // --- Speech Recognition Setup ---
+  const [recognition, setRecognition] = useState(null);
+
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const rec = new SpeechRecognition();
+      rec.continuous = true;
+      rec.interimResults = true;
+      rec.lang = 'en-US';
+
+      rec.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        setDescription((prev) => (prev ? prev + ' ' + transcript : transcript));
+      };
+
+      rec.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        setIsRecording(false);
+        toast.error(`Recording error: ${event.error}`);
+      };
+
+      rec.onend = () => {
+        setIsRecording(false);
+      };
+
+      setRecognition(rec);
+    }
+  }, []);
+
+  const toggleRecording = () => {
+    if (!recognition) {
+      toast.error('Speech recognition is not supported in this browser.');
+      return;
+    }
+
+    if (isRecording) {
+      recognition.stop();
+      setIsRecording(false);
+    } else {
+      try {
+        recognition.start();
+        setIsRecording(true);
+        toast.success('Listening...');
+      } catch (error) {
+        console.error('Recognition start error:', error);
+      }
+    }
+  };
+
+  const handleGenerateSummary = async () => {
+    if (!description.trim()) {
+      toast.error('Please enter a description first');
+      return;
+    }
+
+    setSummarizing(true);
+    try {
+      const summary = await getSummary(description);
+      setAiSummary(summary);
+      toast.success('AI summary generated');
+    } catch (error) {
+      toast.error(error.message || 'Failed to generate summary');
+    } finally {
+      setSummarizing(false);
+    }
+  };
+
 
   const fetchComplaints = async () => {
     try {
@@ -121,10 +202,12 @@ const ComplaintPage = () => {
         description: description.trim(), 
         category, 
         priority, 
-        image 
+        image,
+        aiSummary
       });
       toast.success('Complaint submitted successfully');
       setDescription('');
+      setAiSummary('');
       setCategory('other');
       setPriority('Medium');
       setImage('');
@@ -223,19 +306,74 @@ const ComplaintPage = () => {
                     ))}
                   </select>
                 </div>
-
                 <div className="space-y-2">
                   <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     Description
                   </label>
-                  <textarea
-                    rows={4}
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Describe the issue clearly (location, urgency, helpful details)."
-                    className="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium outline-none transition placeholder:text-slate-400 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                  />
+                  <div className="relative">
+                    <textarea
+                      rows={4}
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder="Describe the issue clearly (location, urgency, helpful details)."
+                      className="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium outline-none transition placeholder:text-slate-400 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={toggleRecording}
+                      className={`absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-full transition shadow-lg ${
+                        isRecording 
+                          ? 'bg-rose-500 text-white animate-pulse' 
+                          : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                      }`}
+                      title={isRecording ? 'Stop recording' : 'Start voice recording'}
+                    >
+                      {isRecording ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+                    </button>
+                    {isRecording && (
+                      <div className="absolute -top-6 right-2 flex items-center gap-1.5">
+                        <span className="flex h-2 w-2 rounded-full bg-rose-500 animate-ping" />
+                        <span className="text-[10px] font-bold text-rose-500 uppercase tracking-tight">Listening...</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                      AI Summary
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleGenerateSummary}
+                      disabled={summarizing || !description.trim()}
+                      className="inline-flex items-center gap-1.5 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-tight hover:underline disabled:opacity-50"
+                    >
+                      {summarizing ? <Loader2 className="h-3 w-3 animate-spin" /> : <BrainCircuit className="h-3.5 w-3.5" />}
+                      {aiSummary ? 'Regenerate Summary' : 'Generate Summary'}
+                    </button>
+                  </div>
+                  
+                  {aiSummary ? (
+                    <div className="relative overflow-hidden rounded-xl bg-indigo-50/50 p-4 border border-indigo-100 dark:bg-indigo-500/5 dark:border-indigo-500/20">
+                      <div className="absolute top-0 right-0 p-2 opacity-10">
+                        <Sparkles className="h-8 w-8 text-indigo-600" />
+                      </div>
+                      <p className="text-xs font-medium text-slate-700 dark:text-slate-300 italic">
+                        "{aiSummary}"
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/30 p-4 dark:border-slate-800 dark:bg-transparent">
+                      <p className="text-[11px] text-slate-400 text-center">
+                        Generate a 1-line summary to help admins understand faster.
+                      </p>
+                    </div>
+                  )}
+                </div>
+
 
                 <div className="space-y-3">
                   <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
@@ -346,6 +484,16 @@ const ComplaintPage = () => {
                           </span>
                         </div>
                         <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">{item.description}</p>
+                        
+                        {item.aiSummary && (
+                          <div className="mt-3 flex items-start gap-2 rounded-lg bg-indigo-50/30 p-2.5 border border-indigo-100/50 dark:bg-indigo-500/5 dark:border-indigo-500/10">
+                            <Sparkles className="h-3.5 w-3.5 text-indigo-500 mt-0.5 shrink-0" />
+                            <p className="text-[11px] font-medium text-indigo-700/80 dark:text-indigo-300/80 italic">
+                              {item.aiSummary}
+                            </p>
+                          </div>
+                        )}
+
                         
                         {item.image && (
                           <div className="mt-4 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800">

@@ -7,6 +7,8 @@ import authRoutes from "./routes/authRoutes.js";
 import complaintRoutes from "./routes/complaintRoutes.js";
 import ruleRoutes from "./routes/ruleRoutes.js";
 import workerRoutes from "./routes/workerRoutes.js";
+import aiRoutes from "./routes/aiRoutes.js";
+
 
 
 // Connect to Database
@@ -30,6 +32,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/complaints", complaintRoutes);
 app.use("/api/rules", ruleRoutes);
 app.use("/api/workers", workerRoutes);
+app.use("/api/ai", aiRoutes);
+
 
 
 app.get("/", (req, res) => {

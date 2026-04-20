@@ -3,7 +3,7 @@ import Complaint from "../models/Complaint.js";
 // ➕ Create Complaint
 export const createComplaint = async (req, res) => {
   try {
-    const { description, category, priority, image } = req.body;
+    const { description, category, priority, image, aiSummary } = req.body;
     const trimmedDescription = description?.trim();
 
     if (!trimmedDescription) {
@@ -16,7 +16,9 @@ export const createComplaint = async (req, res) => {
       category,
       priority: priority || "Medium",
       image,
+      aiSummary,
     });
+
 
     res.status(201).json(complaint);
   } catch (error) {
